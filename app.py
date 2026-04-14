@@ -41,6 +41,9 @@ class MainWindow(QMainWindow):
         super().__init__(*args, **kwargs)
 
         self.setWindowTitle('PyQt Calculator')
+        self.resize(400, 600)
+
+        self.compute_string = ""
 
         layout = QGridLayout()
 
@@ -53,9 +56,16 @@ class MainWindow(QMainWindow):
         layout.addWidget(Color('purple'), 1, 6,  1, 3)
         layout.addWidget(Color('pink'),   1, 9,  1, 3)
 
+        def click_me_parent(num):
+            def click_me():
+                self.compute_string = self.compute_string + str(num)
+                print(self.compute_string)
+            return click_me
+
         # Rows 2-4 - 3 equal parts of 12 (each spans 4)
         for num in range(1, 10):
             btn = ExpandingPushButton(str(num))
+            btn.clicked.connect(click_me_parent(num))
             layout.addWidget(btn, ((num-1)//3)+2, ((num-1)%3)*4, 1, 4)
 
 
