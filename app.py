@@ -44,11 +44,13 @@ class MainWindow(QMainWindow):
         self.resize(400, 600)
 
         self.compute_string = ""
+        label = QLabel("0")
+        label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         layout = QGridLayout()
 
         # Row 0 - full width
-        layout.addWidget(Color('red'), 0, 0, 1, 12)
+        layout.addWidget(label, 0, 0, 1, 12)
 
         # Row 1 - 4 equal parts of 12 (each spans 3)
         layout.addWidget(Color('green'),  1, 0,  1, 3)
@@ -59,6 +61,7 @@ class MainWindow(QMainWindow):
         def click_me_parent(num):
             def click_me():
                 self.compute_string = self.compute_string + str(num)
+                label.setText(self.compute_string)
                 print(self.compute_string)
             return click_me
 
