@@ -26,6 +26,7 @@ class ExpandingPushButton(QPushButton):
             QPushButton {
                 border-radius: 10px;
                 background-color: lightgray;
+                color: red;
             }
             QPushButton:hover {
                 background-color: gray;
@@ -52,15 +53,9 @@ class MainWindow(QMainWindow):
         # Row 0 - full width
         layout.addWidget(label, 0, 0, 1, 12)
 
-        # Row 1 - 4 equal parts of 12 (each spans 3)
-        layout.addWidget(Color('green'),  1, 0,  1, 3)
-        layout.addWidget(Color('blue'),   1, 3,  1, 3)
-        layout.addWidget(Color('purple'), 1, 6,  1, 3)
-        layout.addWidget(Color('pink'),   1, 9,  1, 3)
-
-        def click_me_parent(num):
+        def click_me_parent(symbol):
             def click_me():
-                self.compute_string = self.compute_string + str(num)
+                self.compute_string = self.compute_string + str(symbol)
                 label.setText(self.compute_string)
                 print(self.compute_string)
             return click_me
@@ -71,6 +66,11 @@ class MainWindow(QMainWindow):
             btn.clicked.connect(click_me_parent(num))
             layout.addWidget(btn, ((num-1)//3)+2, ((num-1)%3)*4, 1, 4)
 
+        for num, symbol in enumerate(['+','-','*','/']):
+            btn = ExpandingPushButton(symbol)
+            btn.clicked.connect(click_me_parent(symbol))
+            layout.addWidget(btn, 1, num*3, 1, 3)
+
 
         widget = QWidget()
         widget.setLayout(layout)
@@ -79,7 +79,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    print(QSizePolicy.Policy.Expanding)
 
     # create the main window
     window = MainWindow()
