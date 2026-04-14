@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
     QLabel, QVBoxLayout,
     QGridLayout, QMainWindow,
     QPushButton, QSizePolicy,
+    QHBoxLayout,
 )
 from PyQt6.QtGui import QMovie, QPalette, QColor
 
@@ -50,6 +51,10 @@ class MainWindow(QMainWindow):
 
         layout = QGridLayout()
 
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
         # Row 0 - full width
         layout.addWidget(label, 0, 0, 1, 12)
 
@@ -64,17 +69,24 @@ class MainWindow(QMainWindow):
         for num in range(1, 10):
             btn = ExpandingPushButton(str(num))
             btn.clicked.connect(click_me_parent(num))
-            layout.addWidget(btn, ((num-1)//3)+2, ((num-1)%3)*4, 1, 4)
+            layout.addWidget(btn, ((num-1)//3)+3, ((num-1)%3)*4, 1, 4)
 
-        for num, symbol in enumerate(['+','-','*','/']):
-            btn = ExpandingPushButton(symbol)
-            btn.clicked.connect(click_me_parent(symbol))
-            layout.addWidget(btn, 1, num*3, 1, 3)
+        for num, symbol in enumerate([['+','-'],['*','/'], ['CE','=']]):
+            container = QWidget()
+            container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+            split = QVBoxLayout(container)
+            split.setContentsMargins(0, 0, 0, 0)
 
+            btn = ExpandingPushButton(str(symbol[0]))
+            split.addWidget(btn)
+            btn.clicked.connect(click_me_parent(symbol[0]))
 
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+            btn = ExpandingPushButton(str(symbol[1]))
+            split.addWidget(btn)
+            btn.clicked.connect(click_me_parent(symbol[1]))
+
+            layout.addWidget(container, 2, num*4, 1, 4)
+
 
 
 if __name__ == '__main__':
