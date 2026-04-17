@@ -30,8 +30,8 @@ BUTTON_LAYOUT = [
     ("4", 4, 0), ("5", 4, 4), ("6", 4, 8),
     ("7", 5, 0), ("8", 5, 4), ("9", 5, 8),
     ("0", 7, 0), (".", 7, 4), ("Res", 7, 8),
-    (("+", 2, 0), ("-", 2, 4)),
-    (("*", 2, 0), ("/", 2, 4)),
+    (("+", 2, 0), ("-", 2, 0)),
+    (("*", 2, 4), ("/", 2, 4)),
     (("=", 2, 8), ("CE", 2, 8)),
 ]
 
@@ -58,21 +58,59 @@ class MainWindow(QMainWindow):
 
     def _build_buttons(self, layout: QGridLayout):
         # Digits 1 to 9
-        for button in BUTTON_LAYOUT[:10]:
+        for button in BUTTON_LAYOUT[:11]:
             btn = ExpandingPushButton(button[0])
             btn.clicked.connect(lambda _, n=button[0]: self._append(n) )
             layout.addWidget(btn, button[1], button[2], 1, 4)
-        # Top Split Row
-        for button in BUTTON_LAYOUT[13:]:
+        # Res
+        button = BUTTON_LAYOUT[11]
+        btn = ExpandingPushButton(button[0])
+        btn.clicked.connect(self._use_last_result)
+        layout.addWidget(btn, button[1], button[2], 1, 4)
+        # Top Split Row With Operations (+,-,*,/)
+        for buttons in BUTTON_LAYOUT[12:14]:
             container = QWidget()
             split = QVBoxLayout(container)
             split.setContentsMargins(0,0,0,0)
-
-
+            btn1 = ExpandingPushButton(buttons[0][0])
+            btn1.clicked.connect(lambda _, n=buttons[0][0]: self._append(n))
+            split.addWidget(btn1)
+            btn2 = ExpandingPushButton(buttons[1][0])
+            btn2.clicked.connect(lambda _, n=buttons[1][0]: self._append(n))
+            split.addWidget(btn2)
+            layout.addWidget(container, buttons[0][1], buttons[0][2], 1, 4)
+        # = and CE button
+        buttons = BUTTON_LAYOUT[14]
+        container = QWidget()
+        split = QVBoxLayout(container)
+        split.setContentsMargins(0,0,0,0)
+        btn1 = ExpandingPushButton(buttons[0][0])
+        btn1.clicked.connect(self._eval)
+        split.addWidget(btn1)
+        btn2 = ExpandingPushButton(buttons[1][0])
+        btn2.clicked.connect(self._reset_compute_expr)
+        split.addWidget(btn2)
+        layout.addWidget(container, buttons[0][1], buttons[0][2], 1, 4)
 
     def _append(self, symbol: str):
         self.expr_to_compute += symbol
         self.screen.setText(self.expr_to_compute)
+
+    def _reset_compute_expr(self):
+        self.expr_to_compute = ""
+        self.screen.setText(self.expr_to_compute)
+
+    def _use_last_result(self):
+        self._append(self.last_result)
+
+    def _eval(self):
+        try:
+            self.last_result = str(eval(self.expr_to_compute))
+            self.expr_to_compute = self.last_result
+            self.screen.setText(self.expr_to_compute)
+        except:
+            self.screen.setText("Error!")
+            self.expr_to_compute = ""
 
 
 if __name__ == "__main__":
